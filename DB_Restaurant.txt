@@ -1,0 +1,12 @@
+in MySql:
+CREATE table Cuisines(CuisinesID int not null AUTO_INCREMENT primary key, Name varchar(128) not null);
+
+CREATE table Meal(MealID int not null AUTO_INCREMENT primary key, Name varchar(128) not null);
+
+CREATE table Menu(MenuID int not null AUTO_INCREMENT primary key,
+		  CuisinesID INT not null,
+		  MealID INT not null,
+		  Name varchar(128),
+		  Price decimal(6, 2)
+		  FOREIGN KEY (CuisinesID) references Cuisines(CuisinesID)
+		  FOREIGN KEY (MealID) references Meal(MealID));
