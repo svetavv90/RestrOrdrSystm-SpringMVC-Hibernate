@@ -46,7 +46,7 @@ public class MainController{
         Meal meal = orderDAO.choiceMeal(ml);
         return orderDAO.selectMeal(meal, cuisines);
     }
-    //my attempt to save result in list or array or some other
+    //my attempt to save result in list or array
     @RequestMapping(value = "/result", method = RequestMethod.POST)
     public  ModelAndView getReqwst(@RequestParam(value = "select") String[] select,
                                    @RequestParam(value = "name") String name,
