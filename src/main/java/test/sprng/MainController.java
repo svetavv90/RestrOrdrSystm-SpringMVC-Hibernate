@@ -21,47 +21,67 @@ public class MainController{
     @Autowired
     private OrderDAO orderDAO;
 
-    //divide menu on cuisines and type of meal
     @RequestMapping("/")
-    public String listMealP(Model model) {
-        /*model.addAttribute("orderM", listMain(1, 1));//Polish main course
-        model.addAttribute("orderMP", listMain(1, 2));//Polish dessert
-        model.addAttribute("orderMPD", listMain(1, 3));//Polish drink
-        model.addAttribute("orderMM", listMain(2, 1));//Mexican main course
-        model.addAttribute("orderMML", listMain(2, 2));//Mexican dessert
-        model.addAttribute("orderMMD", listMain(2, 3));//Mexican drink
-        model.addAttribute("orderIM", listMain(3, 1));//Italian main course
-        model.addAttribute("orderID", listMain(3, 2));//Italian dessert
-        model.addAttribute("orderIDR", listMain(3, 3));//Italian drink*/
-        model.addAttribute("order44", listMain(4, 4));//Additional
+    public ModelAndView listCuis() {
+        return new ModelAndView("index");
+    }
+
+    @RequestMapping("/additional_page")
+    public ModelAndView listMealAd() {
+        return new ModelAndView("Additional", "order44", listMain(4, 4));
+    }
+
+    @RequestMapping("/Polish_cuisines")
+    public String listPolMeal(Model model) {
         for (int i = 1; i< 4; i++){
-            for (int j = 1; j < 4; j++){
-                model.addAttribute("order" + i + j, listMain(i, j));//Polish main course
-            }
+                model.addAttribute("order1" + i, listMain(1, i));
         }
-        return "index";
+        model.addAttribute("order44", listMain(4, 4));
+        return "Polish";
+    }
+
+    @RequestMapping("/Mexican_cuisines")
+    public String listMexMeal(Model model) {
+        for (int i = 1; i< 4; i++){
+            model.addAttribute("order2" + i, listMain(2, i));
+        }
+        model.addAttribute("order44", listMain(4, 4));
+        return "Mexican";
+    }
+    @RequestMapping("/Italian_cuisines")
+    public String listItalMeal(Model model) {
+        for (int i = 1; i< 4; i++){
+            model.addAttribute("order3" + i, listMain(3, i));
+        }
+        model.addAttribute("order44", listMain(4, 4));
+        return "Italian";
     }
     public List<Menu> listMain(int csns, int ml) {
+        //supplementary method
         Cuisines cuisines = orderDAO.choiceCuisines(csns);
         Meal meal = orderDAO.choiceMeal(ml);
         return orderDAO.selectMeal(meal, cuisines);
     }
-    //my attempt to save result in list or array
-    @RequestMapping(value = "/result", method = RequestMethod.POST)
-    public  ModelAndView getReqwst(@RequestParam(value = "select") String[] select,
-                                   @RequestParam(value = "name") String name,
-                                   HttpServletRequest request,
-                                   HttpServletResponse response){
-        List<Menu> list = orderDAO.menu(name);
-        for(int i=0; i< list.size(); i++){
-            select = (String[]) list.toArray();
-        }
-        return new ModelAndView("result", "select", select);
+    @RequestMapping("/select")
+    public ModelAndView deletePage(@RequestParam(required = false, value = "selected") int[] selected) {
+        //show selected records
+        if(selected!=null)
+            for(int id: selected){
+                orderDAO.menu(id);
+            }
+        return new ModelAndView("result", "res", orderDAO.allSelected());
     }
-    //redirect to result page
-    @RequestMapping("/result")
-    public String selectCheck(Model model){
-        return "result";
+    @RequestMapping("/show_order_list")
+    public ModelAndView showOrderList(){
+        //redirect by "Order" button
+        return new ModelAndView("result", "res", orderDAO.allSelected());
     }
-
+    @RequestMapping("/commit")
+    public ModelAndView commitTransaction(){
+        //if commit button was clicked, add to AllTransaction table sum and delete record from table Selected Menu
+        orderDAO.addToTrans();
+        //delete this line, when multithreading will be ready
+        orderDAO.deleteAllRecord();
+        return new ModelAndView("index");
+    }
 }
