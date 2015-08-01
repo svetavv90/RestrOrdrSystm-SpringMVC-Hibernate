@@ -78,10 +78,21 @@ public class MainController{
     }
     @RequestMapping("/commit")
     public ModelAndView commitTransaction(){
-        //if commit button was clicked, add to AllTransaction table sum and delete record from table Selected Menu
-        orderDAO.addToTrans();
-        //delete this line, when multithreading will be ready
-        orderDAO.deleteAllRecord();
+        if(orderDAO.allSelected().size()>0){
+            //if commit button was clicked, add to AllTransaction table sum and delete record from table Selected Menu
+            orderDAO.addToTrans();
+            //delete this line, when multithreading will be ready
+            orderDAO.deleteAllRecord();
+        }
         return new ModelAndView("index");
+    }
+    @RequestMapping("/deleted")
+    public ModelAndView deleteRec(@RequestParam(required = false, value = "deleteRecords") int[] deleted) {
+        //show selected records
+        if(deleted!=null)
+            for(int id: deleted){
+                orderDAO.deleteRecords(id);
+            }
+        return new ModelAndView("result", "res", orderDAO.allSelected());
     }
 }
