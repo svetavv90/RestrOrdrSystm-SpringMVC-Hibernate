@@ -14,4 +14,6 @@ public interface OrderDAO {
     public List<SelectedMenu> allSelected();
     public void deleteAllRecord();
     public void addToTrans();
+    public void deleteRecords(int id);
+    public boolean findDrink(int id);
 }
