@@ -1,6 +1,3 @@
-<%@ page import="test.sprng.OrderDaoImpl" %>
-<%@ page import="test.sprng.MainController" %>
-<%@ page import="org.springframework.web.servlet.ModelAndView" %>
 <%--
   Created by IntelliJ IDEA.
   User: Svetlana
@@ -15,36 +12,48 @@
     <title>Selected menu:</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <style>
+        div {
+            margin-top: 5%; /* Отступ сверху */
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-    <h3>All of that you have selected:</h3>
-    <form class="form-inline" role="form" action="/main/commit" method="post">
+    <td><span style=";font-family:Monotype Corsiva;font-size:22px;color:blue;">All of that you have selected:</span></td>
+    <form class="form-inline" role="form" action="/main/deleted" method="post">
         <table class="table table-striped">
             <thead>
             <tr>
+                <td><b>Del</b></td>
                 <td><b>Name</b></td>
                 <td><b>Price</b></td>
             </tr>
             </thead>
             <c:forEach items="${res}" var="r">
                 <tr>
+                    <td><input type="checkbox" name="deleteRecords" value="${r.id}"></td>
                     <td>${r.name}</td>
                     <td>${r.price}</td>
                     <c:set var="pr" scope="session" value="${r.price + pr}"/>
                 </tr>
             </c:forEach>
+            <p align="right">In generally:<input type="text" class="btn btn-default" value= "${pr}"></p>
+            <c:set var="pr" scope="session" value="${0}"/>
         </table>
         <table><tr>
-            <td> <input type="text" class="btn btn-default" value= "${pr}">
-                <c:set var="pr" scope="session" value="${0}"/>
+
         </table>
         <table><tr>
-            <td> <input type="submit" class="btn btn-default" value="Commit">
+            <td> <input type="submit" class="btn btn-default" value="Delete"></td>
+        </tr>
         </table>
     </form>
     <form class="form-inline" role="form" action="/main/" method="post">
         <input type="submit" class="btn btn-default" value="Add new Meal">
+    </form>
+    <form class="form-inline" role="form" action="/main/commit" method="post">
+        <input type="submit" class="btn btn-default" value="Commit">
     </form>
 </div>
 </body>
