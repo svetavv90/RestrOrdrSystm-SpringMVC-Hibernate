@@ -49,8 +49,16 @@ public class OrderDaoImpl implements OrderDAO {
     }
 
     @Override
+    public boolean findDrink(int id) {
+        Query query = entityManager.createQuery("select m from Menu m where m.id=:id", Menu.class);
+        query.setParameter("id", id);
+        Menu menu = (Menu) query.getSingleResult();
+        return menu.getMealID().getId() == 3 ? true : false;
+    }
+
+    @Override
     public List<SelectedMenu> allSelected(){
-        Query query = entityManager.createQuery("SELECT a FROM SelectedMenu a ");/*where a.orderId=1*/
+        Query query = entityManager.createQuery("SELECT a FROM SelectedMenu a ");
         return (List<SelectedMenu>) query.getResultList();
     }
 
@@ -58,9 +66,11 @@ public class OrderDaoImpl implements OrderDAO {
     public void deleteAllRecord(){
         try {
             entityManager.getTransaction().begin();
-            Query query = entityManager.createQuery("delete from SelectedMenu s");/*update SelectedMenu s set s.orderId=0*/
-            query.executeUpdate();
-            entityManager.getTransaction().commit();
+            Query query = entityManager.createQuery("delete from SelectedMenu s");
+            if(query!=null){
+                query.executeUpdate();
+                entityManager.getTransaction().commit();
+            }
         }catch (Exception e){
             entityManager.getTransaction().rollback();
             e.printStackTrace();
@@ -71,9 +81,24 @@ public class OrderDaoImpl implements OrderDAO {
         try{
             Query query = entityManager.createQuery("SELECT sum (a.price) FROM SelectedMenu a");
             double sum = (double) query.getSingleResult();
+            if(sum>0.0){
+                entityManager.getTransaction().begin();
+                AllTransaction aTr = new AllTransaction(sum);
+                entityManager.persist(aTr);
+                entityManager.getTransaction().commit();
+            }
+        }catch (Exception ex) {
+            entityManager.getTransaction().rollback();
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void deleteRecords(int id) {
+        try{
             entityManager.getTransaction().begin();
-            AllTransaction aTr = new AllTransaction(sum);
-            entityManager.persist(aTr);
+            SelectedMenu sel = entityManager.find(SelectedMenu.class, id);
+            entityManager.remove(sel);
             entityManager.getTransaction().commit();
         }catch (Exception ex) {
             entityManager.getTransaction().rollback();
